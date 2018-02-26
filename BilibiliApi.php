@@ -28,7 +28,29 @@ class BiliApi
 
     public function loginWithCaptcha(array $account)
     {
-        //TODO
+        $url = $this->_loginBaseUrl . 'api/oauth2/login';
+        $data = [
+            'appkey' => $this->_appKey,
+            'username' => $account['username'],
+            'captcha' => $account['captcha'],
+        ];
+        $keyHash = json_decode($this->getKeyHash(), true);
+        if ($keyHash['code'] != 0)
+            return json_encode([
+                'code' => $keyHash['code'],
+                'message' => $keyHash['message'],
+            ]);
+        $data['password'] = $this->rsaEncrypt($keyHash['hash'] . $account['password'], $keyHash['key']);
+        $newdata = json_decode($this->getSign($data), true);
+        $raw = $this->curl($url, $newdata,false,$account['cookie']);
+        $temp = json_decode($raw, true);
+        if ($temp['code'] == '0')
+            return json_encode([
+                'code' => $temp['code'],
+                'message' => 'access_token获取成功.',
+                'data' => $temp['data'],
+            ]);
+        return json_encode($temp);
     }
 
     public function login(array $account)
