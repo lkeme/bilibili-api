@@ -252,4 +252,4 @@ class BiliApi
 }
 
 $api = new BiliApi();
-print_r($api->login(['username' => '沙奈之朵', 'password' => 'wct11111']));
+print_r($api->login(['username' => 'x', 'password' => 'x']));
